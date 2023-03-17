@@ -1,5 +1,6 @@
 allprojects {
     apply plugin: 'java-library'
+    apply plugin: 'maven-publish'
 
     group = "io.github.linktosriram.s3lite"
     version = "0.0.2-SNAPSHOT"
@@ -18,6 +19,18 @@ allprojects {
     dependencies {
         testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.1'
         testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.1'
+    }
+
+    java {
+        withSourcesJar()
+    }
+
+    publishing {
+        publications {
+            maven(MavenPublication) {
+                from components.java
+            }
+        }
     }
 }
 
