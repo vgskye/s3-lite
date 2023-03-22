@@ -1,6 +1,7 @@
 package io.github.linktosriram.s3lite.core.mapper;
 
 import javax.xml.stream.XMLInputFactory;
+import java.io.InputStream;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -16,7 +17,7 @@ import static javax.xml.stream.XMLInputFactory.SUPPORT_DTD;
  * @param <T> the type of POJO
  */
 @FunctionalInterface
-public interface ResponseMapper<T> extends Function<byte[], T> {
+public interface ResponseMapper<T> extends Function<InputStream, T> {
 
     static Supplier<XMLInputFactory> newFactory() {
         return () -> {
