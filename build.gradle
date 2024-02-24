@@ -4,12 +4,8 @@ allprojects {
     group = "io.github.linktosriram.s3lite"
     version = "0.0.2-SNAPSHOT"
 
-    java {
-        toolchain {
-            languageVersion = JavaLanguageVersion.of(8)
-            vendor = JvmVendorSpec.AMAZON
-        }
-    }
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
 
     repositories {
         mavenCentral()
