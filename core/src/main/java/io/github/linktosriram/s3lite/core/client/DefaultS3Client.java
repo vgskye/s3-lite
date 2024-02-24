@@ -44,9 +44,7 @@ import java.net.URI;
 import java.util.List;
 import java.util.Map;
 
-import static io.github.linktosriram.s3lite.http.spi.HttpMethod.DELETE;
-import static io.github.linktosriram.s3lite.http.spi.HttpMethod.GET;
-import static io.github.linktosriram.s3lite.http.spi.HttpMethod.PUT;
+import static io.github.linktosriram.s3lite.http.spi.HttpMethod.*;
 import static java.lang.String.format;
 import static java.net.URI.create;
 
@@ -167,6 +165,32 @@ final class DefaultS3Client implements S3Client {
             return unmarshaller.apply(headers);
         } else {
             throw handleErrorResponse(httpResponse);
+        }
+    }
+
+    @Override
+    public GetObjectResponse headObject(final GetObjectRequest request) {
+        final URI endpoint = getEndpoint(request.getBucketName());
+        final SignableRequest signableRequest = new DefaultSignableRequest(HEAD, endpoint, "/" + request.getKey());
+        final SdkRequestMarshaller<GetObjectRequest> marshaller = new GetObjectRequestMarshaller();
+        final SdkResponseUnmarshaller<GetObjectResponse> unmarshaller = new GetObjectResponseUnmarshaller();
+
+        marshaller.accept(signableRequest, request);
+        signer.sign(signableRequest, credentials);
+
+        final ImmutableResponse httpResponse = httpClient.apply(signableRequest);
+
+        if (httpResponse.getStatus().is2xxSuccessful()) {
+            final Map<String, List<String>> headers = httpResponse.getHeaders();
+            return unmarshaller.apply(headers);
+        } else if (httpResponse.getStatus().getStatusCode() == 404) {
+            final ErrorResponse errorResponse = new ErrorResponse();
+            errorResponse.setMessage("Service: S3, Status Code: " + httpResponse.getStatus().getStatusCode());
+            throw new NoSuchKeyException(errorResponse);
+        } else {
+            final ErrorResponse errorResponse = new ErrorResponse();
+            errorResponse.setMessage("Service: S3, Status Code: " + httpResponse.getStatus().getStatusCode());
+            throw new S3Exception(errorResponse);
         }
     }
 

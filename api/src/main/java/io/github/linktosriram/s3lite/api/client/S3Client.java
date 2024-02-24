@@ -62,4 +62,8 @@ public interface S3Client extends Closeable {
     default PutObjectResponse putObject(final PutObjectRequest request, final Path filePath) {
         return putObject(request, RequestBody.fromPath(filePath));
     }
+
+    default GetObjectResponse headObject(final GetObjectRequest request) {
+        throw new UnsupportedOperationException();
+    }
 }
