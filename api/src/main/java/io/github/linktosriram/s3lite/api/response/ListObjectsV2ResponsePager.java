@@ -26,6 +26,11 @@ public class ListObjectsV2ResponsePager {
             public boolean hasNext() {
                 if (lastResponse.getNextContinuationToken() == null) {
                     return !contents.isEmpty();
+                } else if (contents.isEmpty()) {
+                    lastResponse = client.listObjectsV2(baseRequest.continuationToken(lastResponse.getContinuationToken()).build());
+                    contents.addAll(lastResponse.getContents());
+                    commonPrefixes.addAll(lastResponse.getCommonPrefixes());
+                    return hasNext();
                 } else {
                     return true;
                 }
@@ -51,7 +56,12 @@ public class ListObjectsV2ResponsePager {
             @Override
             public boolean hasNext() {
                 if (lastResponse.getNextContinuationToken() == null) {
-                    return !contents.isEmpty();
+                    return !commonPrefixes.isEmpty();
+                } else if (commonPrefixes.isEmpty()) {
+                    lastResponse = client.listObjectsV2(baseRequest.continuationToken(lastResponse.getContinuationToken()).build());
+                    contents.addAll(lastResponse.getContents());
+                    commonPrefixes.addAll(lastResponse.getCommonPrefixes());
+                    return hasNext();
                 } else {
                     return true;
                 }
