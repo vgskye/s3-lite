@@ -25,7 +25,7 @@ public class ListObjectsV2ResponsePager {
             @Override
             public boolean hasNext() {
                 if (lastResponse.getNextContinuationToken() == null) {
-                    return contents.isEmpty();
+                    return !contents.isEmpty();
                 } else {
                     return true;
                 }
