@@ -8,11 +8,7 @@ import io.github.linktosriram.s3lite.http.spi.response.ImmutableResponse;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpMessage;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.client.methods.*;
 import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 
@@ -59,6 +55,8 @@ public class ApacheSdkHttpClient implements SdkHttpClient {
                 return doPut(request);
             case DELETE:
                 return doDelete(request);
+            case HEAD:
+                return doHead(request);
             default:
                 throw new UnsupportedOperationException(request.getHttpMethod() + " not yet supported");
         }
@@ -109,6 +107,18 @@ public class ApacheSdkHttpClient implements SdkHttpClient {
             addHeaders(request.getHeaders(), httpDelete);
 
             return retrieve(httpDelete);
+        } catch (final URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private ImmutableResponse doHead(final ImmutableRequest request) {
+        try {
+            final URI uri = getUri(request);
+            final HttpUriRequest httpHead = new HttpHead(uri);
+            addHeaders(request.getHeaders(), httpHead);
+
+            return retrieve(httpHead);
         } catch (final URISyntaxException e) {
             throw new RuntimeException(e);
         }
