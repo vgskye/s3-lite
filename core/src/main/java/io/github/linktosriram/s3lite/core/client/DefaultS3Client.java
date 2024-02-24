@@ -182,12 +182,20 @@ final class DefaultS3Client implements S3Client {
             final Map<String, List<String>> headers = httpResponse.getHeaders();
             return unmarshaller.apply(headers);
         } else if (httpResponse.getStatus().getStatusCode() == 404) {
-            final ErrorResponse errorResponse = new ErrorResponse();
-            errorResponse.setMessage("Service: S3, Status Code: " + httpResponse.getStatus().getStatusCode());
+            final ErrorResponse errorResponse = ErrorResponse.builder()
+                .code("NoSuchKey")
+                .message("Service: S3, Status Code: " + httpResponse.getStatus().getStatusCode())
+                .requestId(httpResponse.getHeaders().get("x-amz-request-id").get(0))
+                .resource("/" + request.getKey())
+                .build();
             throw new NoSuchKeyException(errorResponse);
         } else {
-            final ErrorResponse errorResponse = new ErrorResponse();
-            errorResponse.setMessage("Service: S3, Status Code: " + httpResponse.getStatus().getStatusCode());
+            final ErrorResponse errorResponse = ErrorResponse.builder()
+                .code("S3LiteUnknown" + httpResponse.getStatus().getStatusCode())
+                .message("Service: S3, Status Code: " + httpResponse.getStatus().getStatusCode())
+                .requestId(httpResponse.getHeaders().get("x-amz-request-id").get(0))
+                .resource("/" + request.getKey())
+                .build();
             throw new S3Exception(errorResponse);
         }
     }
