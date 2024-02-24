@@ -14,7 +14,6 @@ public class PutObjectRequestMarshaller implements SdkRequestMarshaller<PutObjec
     @Override
     public void accept(final SignableRequest signableRequest, final PutObjectRequest request) {
         final String responseExpires = formatIfNotNull(request.getExpires(), RFC_1123_DATE_TIME_FORMATTER);
-        signableRequest.addHeader("Expect", "100-continue");
         addMetadata(signableRequest, request.getMetadata());
 
         addHeaderIfNotNull(signableRequest, "x-amz-acl", request.getAcl());
